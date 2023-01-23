@@ -12,14 +12,19 @@ function Register() {
   } = useForm({ // the hook we are going to create
     validations: { // all our validation rules go here
       username: {
-        pattern: {
-          value: '^[A-Za-z]*$',
-          message:
-            "You're not allowed ...",
-        },
+        custom: {
+          isValid: (value: string) => value.length > 6,
+          message: 'Username should be at least 6 length',
+        }
       },
+      email: {
+        required: {
+          value: false,
+          message: 'email is not req',
+        }
+      }
     },
-    onSubmit: () => alert('Get data', data),
+    onSubmit: () => alert('Submit!'),
     initialValues: { // used to initialize the data
       username: '',
     },
@@ -85,7 +90,7 @@ function Register() {
         <input
           type="text"
           className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-          id="usernameInput"
+          id="emailInput"
           placeholder="Email"
           required={false}
         />
