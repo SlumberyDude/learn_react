@@ -3,6 +3,15 @@ import { FaFacebook, FaTwitter, FaGithub } from "react-icons/fa";
 import { Link } from '@tanstack/react-router'
 import { useForm } from '../hooks/useForm'
 
+const fieldStyles = [
+  'form-control', 'block', 'w-full', 'px-4', 'py-2', 'text-xl', 'font-normal', 'text-gray-700', 'bg-white', 'bg-clip-padding', 'border', 'border-solid', 'rounded', 'transition', 'ease-in-out', 'm-0',
+  'focus:text-gray-700', 'focus:bg-white', 'focus:border-blue-600',
+  'focus:outline-none'
+].join(' ');
+
+const goodFieldStyles = fieldStyles + ' border-gray-300';
+const badFieldStyles = fieldStyles + ' border-red-700';
+
 function Register() {
   const {
     handleSubmit, // handles form submission
@@ -22,13 +31,24 @@ function Register() {
           value: false,
           message: 'email is not req',
         }
+      },
+      password: {},
+      password2: {
+        match: {
+          'attribute': 'password',
+          'message': 'Passwords not match'
+        }
       }
     },
-    onSubmit: () => alert('Submit!'),
+    // onSubmit: () => alert('Submit!'),
     initialValues: { // used to initialize the data
       username: '',
+      password: '',
+      password2: '',
     },
   });
+
+  
 
   return (
     <div className="container w-96 mx-auto mt-2">
@@ -74,7 +94,7 @@ function Register() {
       <div className="mb-6">
         <input
           type="text"
-          className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+          className={ errors.username == undefined ? goodFieldStyles : badFieldStyles }
           id="usernameInput"
           placeholder="Username"
           required={true}
@@ -89,33 +109,40 @@ function Register() {
       <div className="mb-6">
         <input
           type="text"
-          className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+          className={ errors.email == undefined ? goodFieldStyles : badFieldStyles }
           id="emailInput"
           placeholder="Email"
           required={false}
         />
+        {errors.email && <p className='text-red-500'>{errors.email}</p>}
       </div>
 
       {/* <!-- Password input --> */}
       <div className="mb-6">
         <input
           type="password"
-          className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+          className={ errors.password == undefined ? goodFieldStyles : badFieldStyles }
           id="passwordInput"
           placeholder="Password"
           required={true}
+          value={data.password || ''}
+          onChange={handleChange('password', (x: string) => x )}
         />
+        {errors.password && <p className='text-red-500'>{errors.password}</p>}
       </div>
 
       {/* <!-- Password input --> */}
       <div className="mb-6">
         <input
           type="password"
-          className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+          className={ errors.password2 == undefined ? goodFieldStyles : badFieldStyles }
           id="passwordInputConfirm"
           placeholder="Confirm Password"
           required={true}
+          value={data.password2 || ''}
+          onChange={handleChange('password2', (x: string) => x )}
         />
+        {errors.password2 && <p className='text-red-500'>{errors.password2}</p>}
       </div>
 
       <div className="text-center">

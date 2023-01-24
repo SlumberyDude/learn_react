@@ -1,37 +1,6 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 
-// type RulePattern = {
-//   value: string;
-//   message: string;
-// }
-
-// type RuleCustom = {
-//   isValid: (value: string) => boolean;
-//   message: string;
-// }
-
-// type RuleRequired = {
-//   value: boolean;  
-//   message: string;
-// }
-
-// type RuleMap = {
-//   required?: RuleRequired
-//   custom?: RuleCustom
-//   pattern?: RulePattern
-// }
-
-// type Validations = {
-//   [field_name: string]: RuleMap;
-// }
-
-// type Options = {
-//   validations?: Validations;
-//   onSubmit?: (value?: unknown) => void;
-//   initialValues?: { [key: string]: unknown }
-// }
-
-interface Validation {
+interface Validation<T = { [key: string]: unknown }> {
   required?: {
     value: boolean;
     message: string;
@@ -44,11 +13,13 @@ interface Validation {
     isValid: (value: string) => boolean;
     message: string;
   };
+  match?: {
+    attribute: keyof T;
+    message: string;
+  }
 }
 
-// type Validations<T extends {}> = Record<keyof T, Validation>;
-type Validations<T extends {}> = Partial<Record<keyof T, Validation>>;
-
+type Validations<T extends {}> = Partial<Record<keyof T, Validation<T>>>;
 type ErrorRecord<T> = Partial<Record<keyof T, string>>;
 
 export const useForm = <T extends Record<keyof T, string> = {}> (options?: {
@@ -73,11 +44,10 @@ export const useForm = <T extends Record<keyof T, string> = {}> (options?: {
   
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const validations = options?.validations;
     if (options?.onSubmit) {
       options.onSubmit();
     }
-    const validations = options?.validations;
-
     if (validations) {
       let valid = true;
       // const newErrors: { [key: string]: string} = {};
@@ -105,12 +75,52 @@ export const useForm = <T extends Record<keyof T, string> = {}> (options?: {
           valid = false;
           newErrors[field_name] = custom.message;
         }
+        // MATCH
+        const match = validation?.match;
+        if (match?.attribute) {
+          const other_val = data[match.attribute]
+          if (value != other_val) {
+            valid = false;
+            newErrors[field_name] = match.message;
+          }
+        }
       }
       // now newErrors filled with some messages
       if (!valid) {
         setErrors(newErrors);
         return;
       }
+      setErrors({}) // remove errors
+      console.log('Pass client side validation');
+      // check if user already exists in db
+      fetch("/api/register", {
+        "method": "POST",
+        "headers": {
+          "Connection": "keep-alive",
+          "content-type": "application/json",
+          "accept": "*/*"
+        },
+        "body": JSON.stringify({
+            username: data['username' as Extract<keyof T, string>],
+            password: data['password' as Extract<keyof T, string>],
+            password_confirm: data['password2' as Extract<keyof T, string>]
+        })
+      })
+      .then(response => response.json())
+      .then(response => {
+        if (response.detail != undefined) {
+          // something wrong and we got an error message
+          // TODO:
+          // I need to fix the error flow
+          // Need to add location of the error message
+          // Now I will count it as a username error
+          console.log(response)
+        }
+        // console.log(response.detail[0])
+      })
+      .catch(err => {
+        console.log(err);
+      });
     }
   };
 
