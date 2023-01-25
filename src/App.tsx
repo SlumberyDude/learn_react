@@ -4,41 +4,28 @@ import Links from "./components/Links";
 import Register from "./components/Register";
 
 import { 
-  createRouteConfig,
-  RouterProvider,
-  Link,
-  ReactRouter
-} from '@tanstack/react-router'
+  Outlet, ReactLocation, Router 
+} from "@tanstack/react-location";
 
-const rootRoute = createRouteConfig()
-
-const loginRoute = rootRoute.createRoute({
-  path: 'login',
-  component: Login
-})
-
-const registerRoute = rootRoute.createRoute({
-  path: '/register',
-  component: Register
-})
-
-const linksRoute = rootRoute.createRoute({
-  path: '/',
-  component: Links
-})
-
-const routeConfig = rootRoute.addChildren([
-  linksRoute,
-  loginRoute,
-  registerRoute
-])
-
-const router = new ReactRouter({ routeConfig })
-
+const location = new ReactLocation();
 
 function App() {
   return (
-    <RouterProvider router={router} />
+    <Router
+      location={location}
+      routes={[
+        { path: '/', element: <Links /> },
+        {
+          path: 'login',
+          element: <Login />
+        },
+        {
+          path: 'register',
+          element: <Register />
+        },
+      ]}
+    >
+    </Router>
   )
 }
 

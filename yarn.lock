@@ -201,7 +201,7 @@
     "@babel/plugin-syntax-jsx" "^7.18.6"
     "@babel/types" "^7.18.6"
 
-"@babel/runtime@^7.16.7":
+"@babel/runtime@^7.16.7", "@babel/runtime@^7.7.6":
   version "7.20.13"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.20.13.tgz#7055ab8a7cff2b8f6058bf6ae45ff84ad2aded4b"
   integrity sha512-gt3PKXs0DBoL9xCvOIIZ2NEqAGZqHjAnmVbfQtB620V0uReIQutpel14KcneZuer7UioY8ALKZ7iocavvzTNFA==
@@ -336,30 +336,13 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@solidjs/reactivity@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@solidjs/reactivity/-/reactivity-0.0.7.tgz#69f0e276d61aa5939695fff689be9c1b4b72bbf9"
-  integrity sha512-phONsQ2J7iGlsXbCeVFJTD57P4jzCX9hsV17QoIrj27fs26n3vHBYxFkFUbn6E9eq+wjbdXo5zbirLj5WsvLxA==
-
-"@tanstack/react-router@^0.0.1-beta.53":
-  version "0.0.1-beta.53"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-router/-/react-router-0.0.1-beta.53.tgz#4f953440fcf7958564f13f8a594386ec89c941bf"
-  integrity sha512-vqBCSzlRqNJ/KhldzUuRN8OsuxVJt/aXxsRmJMUFLtu+TaHe8xj6jpdiy0P9IlIcsXEdE+XasWj4bkn4lGslGA==
+"@tanstack/react-location@^3.7.4":
+  version "3.7.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-location/-/react-location-3.7.4.tgz#0125ba5685805d232429b8df70d20cb6c2a56cec"
+  integrity sha512-6rH2vNHGr0uyeUz5ZHvWMYjeYKGgIKFzvs5749QtnS9f+FU7t7fQE0hKZAzltBZk82LT7iYbcHBRyUg2lW13VA==
   dependencies:
     "@babel/runtime" "^7.16.7"
-    "@solidjs/reactivity" "^0.0.7"
-    "@tanstack/router-core" "0.0.1-beta.53"
-    use-sync-external-store "^1.2.0"
-
-"@tanstack/router-core@0.0.1-beta.53":
-  version "0.0.1-beta.53"
-  resolved "https://registry.yarnpkg.com/@tanstack/router-core/-/router-core-0.0.1-beta.53.tgz#6fea58c78948e2d01648494e67a70b14c51c176d"
-  integrity sha512-reC6IJjwgtjAyZx3ZbI5aKlV2KPtLUunCAjiRSIgfmRYFDTWrS0vHFQoSOksBzZYTNr98kB7UGvLo70KyYc/aQ==
-  dependencies:
-    "@babel/runtime" "^7.16.7"
-    "@solidjs/reactivity" "^0.0.7"
-    immer "^9.0.15"
-    tiny-invariant "^1.3.1"
+    history "^5.2.0"
 
 "@types/history@^4.7.11":
   version "4.7.11"
@@ -1566,15 +1549,17 @@ has@^1.0.3:
   dependencies:
     function-bind "^1.1.1"
 
+history@^5.2.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/history/-/history-5.3.0.tgz#1548abaa245ba47992f063a0783db91ef201c73b"
+  integrity sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==
+  dependencies:
+    "@babel/runtime" "^7.7.6"
+
 ignore@^5.1.1, ignore@^5.2.0:
   version "5.2.4"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.2.4.tgz#a291c0c6178ff1b960befe47fcdec301674a6324"
   integrity sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==
-
-immer@^9.0.15:
-  version "9.0.18"
-  resolved "https://registry.yarnpkg.com/immer/-/immer-9.0.18.tgz#d2faee58fd0e34f017f329b98cdab37826fa31b8"
-  integrity sha512-eAPNpsj7Ax1q6Y/3lm2PmlwRcFzpON7HSNQ3ru5WQH1/PSpnyed/HpNOELl2CxLKoj4r+bAHgdyKqW5gc2Se1A==
 
 import-fresh@^3.0.0, import-fresh@^3.2.1:
   version "3.3.0"
@@ -2436,11 +2421,6 @@ text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==
 
-tiny-invariant@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/tiny-invariant/-/tiny-invariant-1.3.1.tgz#8560808c916ef02ecfd55e66090df23a4b7aa642"
-  integrity sha512-AD5ih2NlSssTCwsMznbvwMZpJ1cbhkGd2uueNxzv2jDlEeZdU04JQfRnggJQ8DrcVBGjAsCKwFBbDlVNtEMlzw==
-
 to-fast-properties@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/to-fast-properties/-/to-fast-properties-2.0.0.tgz#dc5e698cbd079265bc73e0377681a4e4e83f616e"
@@ -2525,11 +2505,6 @@ uri-js@^4.2.2:
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
   dependencies:
     punycode "^2.1.0"
-
-use-sync-external-store@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
-  integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
 
 util-deprecate@^1.0.2:
   version "1.0.2"

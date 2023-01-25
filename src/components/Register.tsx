@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect } from 'react'
 import { FaFacebook, FaTwitter, FaGithub } from "react-icons/fa";
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-location'
 import { useForm } from '../hooks/useForm'
 
 const fieldStyles = [
@@ -9,23 +9,31 @@ const fieldStyles = [
   'focus:outline-none'
 ].join(' ');
 
+const regBtnBase = 'inline-block px-7 py-3 text-white font-medium text-sm leading-snug uppercase rounded'
+
+const regBtnActive = regBtnBase + ' bg-gray-600 hover:bg-gray-700 focus:bg-gray-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-gray-800 active:shadow-lg transition duration-150 ease-in-out';
+
+const regBtnInactive = regBtnBase + ' bg-gray-200';
+
+
+
 const goodFieldStyles = fieldStyles + ' border-gray-300';
 const badFieldStyles = fieldStyles + ' border-red-700';
 
 function Register() {
+
+  console.log('Register RUN')
+
   const {
     handleSubmit, // handles form submission
     handleChange, // handles input changes
     data, // access to the form data
     errors, // includes the errors to show
+    isLoading, // loading indicator
+    isReady, // ready indicator (when we ready to redirect)
   } = useForm({ // the hook we are going to create
     validations: { // all our validation rules go here
-      username: {
-        custom: {
-          isValid: (value: string) => value.length > 6,
-          message: 'Username should be at least 6 length',
-        }
-      },
+      username: {},
       email: {
         required: {
           value: false,
@@ -48,7 +56,14 @@ function Register() {
     },
   });
 
-  
+  // const navigate = useNavigate()
+  // if (isReady) {
+  //   console.log('Is Ready for redirect now');
+  //   navigate({ to: '/login', replace: false })
+  // }
+
+  // const [regstate, setRegstate] = useState();
+  // console.log(`In Register, isLoading: ${isLoading}`)
 
   return (
     <div className="container w-96 mx-auto mt-2">
@@ -148,10 +163,10 @@ function Register() {
       <div className="text-center">
         <button
           type="submit"
-          
-          className="inline-block px-7 py-3 bg-gray-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-gray-700 hover:shadow-lg focus:bg-gray-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-gray-800 active:shadow-lg transition duration-150 ease-in-out"
+          className={isLoading ? regBtnInactive : regBtnActive}
+          disabled={isLoading ? true : false}
         >
-          Register
+          {isLoading ? 'Wait...' : 'Register'}
         </button>
         <p className="text-sm font-semibold mt-2 pt-1 mb-0">
           Already have an account?
@@ -165,4 +180,26 @@ function Register() {
   )
 }
 
-export default Register
+// function Register() {
+//   console.log('REGISTER RUN')
+//   useTest()
+//   const navigate = useNavigate();
+//   //   if (isReady) {
+// //     console.log('Is Ready for redirect now');
+// //     navigate({ to: '/login', replace: false })
+// //   }
+//   return (
+//     <div>
+//       <Link to={'/login'} className="text-red-600 hover:text-red-700 focus:text-red-700 transition duration-200 ease-in-out pl-1">Login </Link>
+//       <button onClick={() => navigate({ to: '/', replace: false })}>
+//         Navigate
+//       </button>
+//     </div>
+//   )
+// }
+
+// function useTest() {
+//   console.log('Run useTest')
+// }
+
+// export default Register

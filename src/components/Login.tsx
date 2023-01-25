@@ -1,6 +1,6 @@
 import React from 'react'
 import { FaFacebook, FaTwitter, FaGithub } from "react-icons/fa";
-import { Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-location'
 
 function Login() {
   return (

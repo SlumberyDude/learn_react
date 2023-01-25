@@ -12,7 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tanstack/react-router": "^0.0.1-beta.53",
+    "@tanstack/react-location": "^3.7.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1"

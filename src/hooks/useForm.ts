@@ -1,4 +1,5 @@
 import { ChangeEvent, FormEvent, useState } from "react";
+// import { useNavigate } from '@tanstack/react-location'
 
 interface Validation<T = { [key: string]: unknown }> {
   required?: {
@@ -22,6 +23,8 @@ interface Validation<T = { [key: string]: unknown }> {
 type Validations<T extends {}> = Partial<Record<keyof T, Validation<T>>>;
 type ErrorRecord<T> = Partial<Record<keyof T, string>>;
 
+// const navigate = useNavigate();
+
 export const useForm = <T extends Record<keyof T, string> = {}> (options?: {
   validations?: Validations<T>;
   initialValues?: Partial<T>;
@@ -30,6 +33,8 @@ export const useForm = <T extends Record<keyof T, string> = {}> (options?: {
   // ...
   const [data, setData] = useState<T>((options?.initialValues || {}) as T);
   const [errors, setErrors] = useState<ErrorRecord<T>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
   const handleChange = <S extends unknown>(
     key: keyof T,
@@ -91,6 +96,7 @@ export const useForm = <T extends Record<keyof T, string> = {}> (options?: {
         return;
       }
       setErrors({}) // remove errors
+      setIsLoading(true)
       console.log('Pass client side validation');
       // check if user already exists in db
       fetch("/api/register", {
@@ -109,14 +115,28 @@ export const useForm = <T extends Record<keyof T, string> = {}> (options?: {
       .then(response => response.json())
       .then(response => {
         if (response.detail != undefined) {
-          // something wrong and we got an error message
-          // TODO:
-          // I need to fix the error flow
-          // Need to add location of the error message
-          // Now I will count it as a username error
-          console.log(response)
+          // In the case it's an error message
+          newErrors['username' as Extract<keyof T, string>] = response.detail;
+          setErrors(newErrors)
         }
-        // console.log(response.detail[0])
+        if (response.Message != undefined) {
+          if (response.Message == 'Registration successfull!') {
+            // successfull registration
+            console.log('call "setIsReady"')
+            setIsReady(true)
+            // navigate({ to: './', replace: true })
+          } else {
+            newErrors['username' as Extract<keyof T, string>]
+            = `Unknown message: ${response.Message}`;
+            setErrors(newErrors)
+          }
+            console.log("🚀 ~ file: useForm.ts:133 ~ handleSubmit ~ setIsReady", setIsReady)
+            console.log("🚀 ~ file: useForm.ts:133 ~ handleSubmit ~ setIsReady", setIsReady)
+            console.log("🚀 ~ file: useForm.ts:133 ~ handleSubmit ~ setIsReady", setIsReady)
+        }
+        // loading is finished, lower the flag
+        setIsLoading(false)
+        // console.log(response)
       })
       .catch(err => {
         console.log(err);
@@ -129,6 +149,8 @@ export const useForm = <T extends Record<keyof T, string> = {}> (options?: {
     handleChange,
     handleSubmit,
     errors,
+    isLoading,
+    isReady
   };
 
 };
