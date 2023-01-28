@@ -1,7 +1,26 @@
-import React, { useEffect } from 'react';
-import { FaFacebook, FaTwitter, FaGithub } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-location';
-import { useForm } from '../hooks/useForm';
+import SocialLinks from './SocialLinks';
+
+import { useForm, SubmitHandler, UseFormSetError } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Api, HTTPValidationError, ValidationError, HttpResponse } from '../api/Api';
+
+import * as Yup from 'yup';
+
+const apiClien = new Api({ baseUrl: import.meta.env.DEV ? '/api' : 'https://' });
+
+const formSchema = Yup.object().shape({
+  username: Yup.string()
+    .required('Username is mandatory')
+    .matches(RegExp('^[A-Za-z]+[0-9A-Za-z]*$'), { message: 'Username should ude only latin symbols and numbers' }),
+  email: Yup.string().email().optional(),
+  password: Yup.string().required('Password is mandatory').min(6, 'Password must be at least 6 char long'),
+  password2: Yup.string()
+    .required('Password is mandatory')
+    .oneOf([Yup.ref('password')], 'Passwords does not match'),
+});
+const formOptions = { resolver: yupResolver(formSchema) };
 
 const fieldStyles =
   'form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none';
@@ -17,87 +36,108 @@ const regBtnInactive = regBtnBase + ' bg-gray-200';
 const goodFieldStyles = fieldStyles + ' border-gray-300';
 const badFieldStyles = fieldStyles + ' border-red-700';
 
+type FD = Yup.InferType<typeof formSchema>;
+type RemoveIndex<T> = {
+  [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K];
+};
+type FormData = RemoveIndex<FD>;
+
+// type FormData2 = Omit<FormData, >
+
+// type ServerResponse<T> = {
+//   success: boolean,
+//   errors?: { [P in keyof T]:  }
+//   data?:
+// }
+
+// backend emulation
+type postDataResult<T> = {
+  success: boolean;
+  errors?: { [P in keyof T]?: string[] };
+};
+const postData = ({ username }: FormData): Promise<postDataResult<FormData>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      if (username === 'Evgen') {
+        resolve({
+          success: false,
+          errors: {
+            username: ['The name must be unique'],
+          },
+        });
+      } else {
+        resolve({ success: true });
+      }
+    }, 100);
+  });
+};
+
+function addServerErrors(errors: { [P in keyof FormData]?: string[] }, setError: UseFormSetError<FormData>) {
+  return Object.keys(errors).forEach((key) => {
+    console.log(key);
+    setError(key as keyof FormData, {
+      type: 'server',
+      message: errors[key as keyof FormData]!.join('. '),
+    });
+  });
+}
+
 function Register() {
   console.log('Register RUN');
-
   const {
-    handleSubmit, // handles form submission
-    handleChange, // handles input changes
-    data, // access to the form data
-    errors, // includes the errors to show
-    isLoading, // loading indicator
-    isReady, // ready indicator (when we ready to redirect)
-  } = useForm({
-    // the hook we are going to create
-    validations: {
-      // all our validation rules go here
-      username: {},
-      email: {
-        required: {
-          value: false,
-          message: 'email is not req',
-        },
-      },
-      password: {},
-      password2: {
-        match: {
-          attribute: 'password',
-          message: 'Passwords not match',
-        },
-      },
-    },
-    // onSubmit: () => alert('Submit!'),
-    initialValues: {
-      // used to initialize the data
-      username: '',
-      password: '',
-      password2: '',
-    },
-  });
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    setError,
+  } = useForm<FormData>(formOptions);
 
-  // const navigate = useNavigate()
-  // if (isReady) {
-  //   console.log('Is Ready for redirect now');
-  //   navigate({ to: '/login', replace: false })
-  // }
+  const navigate = useNavigate();
 
-  // const [regstate, setRegstate] = useState();
-  // console.log(`In Register, isLoading: ${isLoading}`)
+  const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
+    // const result = await postData(data as FormData);
+    const formData: FormData = data as FormData;
+    const result = await apiClien.register
+      .registerRegisterPost({
+        username: formData.username,
+        password: formData.password,
+        password_confirm: formData.password2,
+      })
+      .then(() => {
+        console.log('Success registration');
+        navigate({ to: '/login', replace: false });
+      })
+      .catch((result: HttpResponse<any, HTTPValidationError>) => {
+        // const message = result.detail;
+        console.log(`error detail: ${result.error.detail}`);
+        setError('username', { message: 'DEBUG_1' });
+        if (result.error.detail != undefined) {
+          setError('username', { message: 'DEBUG_2' });
 
+          const errors: { [P in keyof Partial<FormData>]: string[] } = {
+            username: [result.error.detail[0].msg],
+          };
+          console.log(result.error.detail);
+          console.log(errors);
+          console.log(errors.username);
+          addServerErrors(errors, setError);
+        }
+      });
+
+    // if (!result.success && result.errors) {
+    //   addServerErrors<FormData>(result.errors, setError);
+    // }
+    // console.log(JSON.stringify(data, null, 2));
+    // navigate({ to: '/', replace: false });
+  };
+
+  // console.log(watch('username')); // watch input value by passing the name of it
+
+  const isLoading = false;
   return (
     <div className="container w-96 mx-auto mt-2">
-      <form onSubmit={handleSubmit}>
-        <div className="flex flex-row items-center justify-center">
-          <p className="text-lg mb-0 mr-4">Register with</p>
-
-          <button
-            type="button"
-            data-mdb-ripple="true"
-            data-mdb-ripple-color="light"
-            className="inline-block p-0 text-gray-600 font-medium text-xs leading-tight uppercase rounded-full hover:text-gray-700 transition duration-150 ease-in-out mx-1"
-          >
-            <FaFacebook className="text-3xl" />
-          </button>
-
-          <button
-            type="button"
-            data-mdb-ripple="true"
-            data-mdb-ripple-color="light"
-            className="inline-block p-0 text-gray-600 font-medium text-xs leading-tight uppercase rounded-full hover:text-gray-700 transition duration-150 ease-in-out mx-1"
-          >
-            <FaTwitter className="text-3xl" />
-          </button>
-
-          <button
-            type="button"
-            data-mdb-ripple="true"
-            data-mdb-ripple-color="light"
-            className="inline-block p-0 text-gray-600 font-medium text-xs leading-tight uppercase rounded-full hover:text-gray-700 transition duration-150 ease-in-out mx-1"
-          >
-            <FaGithub className="text-3xl" />
-          </button>
-        </div>
-
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <SocialLinks />
         <div className="flex items-center my-4 before:flex-1 before:border-t before:border-gray-300 before:mt-0.5 after:flex-1 after:border-t after:border-gray-300 after:mt-0.5">
           <p className="text-center font-semibold mx-4 mb-0">Or</p>
         </div>
@@ -105,56 +145,46 @@ function Register() {
         {/* Username */}
         <div className="mb-6">
           <input
-            type="text"
-            className={errors.username == undefined ? goodFieldStyles : badFieldStyles}
-            id="usernameInput"
+            defaultValue=""
             placeholder="Username"
-            required={true}
-            value={data.username || ''}
-            onChange={handleChange('username', (x: string) => x.trim())}
-            pattern="^[\w\d]+$"
+            className={goodFieldStyles}
+            {...register('username', { required: true })}
           />
-          {errors.username && <p className="text-red-500">{errors.username}</p>}
+          <p className="text-red-500">{(errors.username?.message as string) || ''}</p>
+          {/* {errors.username && <p className="text-red-500">{errors.username.message}</p>} */}
         </div>
 
         {/* Email */}
         <div className="mb-6">
-          <input
-            type="text"
-            className={errors.email == undefined ? goodFieldStyles : badFieldStyles}
-            id="emailInput"
-            placeholder="Email"
-            required={false}
-          />
-          {errors.email && <p className="text-red-500">{errors.email}</p>}
+          <input defaultValue="" placeholder="Email" type="email" className={goodFieldStyles} {...register('email')} />
+          {/* {errors.email && <p className="text-red-500">Error</p>} */}
+          <p className="text-red-500">{(errors.email?.message as string) || ''}</p>
         </div>
 
         {/* <!-- Password input --> */}
         <div className="mb-6">
           <input
-            type="password"
-            className={errors.password == undefined ? goodFieldStyles : badFieldStyles}
-            id="passwordInput"
+            defaultValue=""
             placeholder="Password"
-            required={true}
-            value={data.password || ''}
-            onChange={handleChange('password', (x: string) => x)}
+            type="password"
+            className={goodFieldStyles}
+            {...register('password', { required: true })}
           />
-          {errors.password && <p className="text-red-500">{errors.password}</p>}
+          <p className="text-red-500">{(errors.password?.message as string) || ''}</p>
+          {/* {errors.password && <p className="text-red-500">Error</p>} */}
         </div>
 
-        {/* <!-- Password input --> */}
+        {/* <!-- Password2 input --> */}
         <div className="mb-6">
           <input
+            defaultValue=""
+            placeholder="Password confirm"
             type="password"
-            className={errors.password2 == undefined ? goodFieldStyles : badFieldStyles}
-            id="passwordInputConfirm"
-            placeholder="Confirm Password"
-            required={true}
-            value={data.password2 || ''}
-            onChange={handleChange('password2', (x: string) => x)}
+            className={goodFieldStyles}
+            {...register('password2', { required: true })}
           />
-          {errors.password2 && <p className="text-red-500">{errors.password2}</p>}
+          <p className="text-red-500">{(errors.password2?.message as string) || ''}</p>
+          {/* {errors.password2 && <p className="text-red-500">Error</p>} */}
         </div>
 
         <div className="text-center">
